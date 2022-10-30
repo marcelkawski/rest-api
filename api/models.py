@@ -9,9 +9,9 @@ class Photo(models.Model):
     )
     title = models.CharField(max_length=64)
     album_id = models.PositiveIntegerField()
-    width = models.PositiveIntegerField()
-    height = models.PositiveIntegerField()
-    dominant_color = models.CharField(max_length=7)
+    width = models.PositiveIntegerField(blank=True)
+    height = models.PositiveIntegerField(blank=True)
+    color = models.CharField(max_length=7, blank=True)
 
     def __str__(self):
         return self.title
