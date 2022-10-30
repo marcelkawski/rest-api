@@ -25,6 +25,6 @@ class Photo(models.Model):
         # Find, convert and set the dominant color of the image
         color_thief = ColorThief(self.url)
         dominant_color = color_thief.get_color(quality=1)
-        self.dominant_color = '#%02x%02x%02x' % dominant_color
+        self.color = '#%02x%02x%02x' % dominant_color
 
         super().save(*args, **kwargs)

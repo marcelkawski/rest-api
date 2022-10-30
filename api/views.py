@@ -6,10 +6,10 @@ from .models import Photo
 from .serializers import PhotoSerializer
 
 
-class RESTAPIView(APIView):
+class PhotoAllView(APIView):
     def get(self, request, *args, **kwargs):
         """
-        Get the list of all the photos
+        Gets the list of all the photos.
         """
         photos = Photo.objects.all()
         serializer = PhotoSerializer(photos, many=True)
@@ -17,13 +17,10 @@ class RESTAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Create a new photo with data given in the request
+        Creates a new photo with data given in the request.
         """
-        data = {
-            'url': request.data.get('url'),
-            'title': request.data.get('title'),
-            'album_id': request.data.get('album_id')
-        }
+        fields = ['url', 'title', 'album_id']
+        data = {field_name: request.data.get(field_name) for field_name in fields}
 
         serializer = PhotoSerializer(data=data)
         if serializer.is_valid():
@@ -31,3 +28,53 @@ class RESTAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PhotoDetailView(APIView):
+    def patch(self, request, photo_id, *args, **kwargs):
+        """
+        Updates the photo with the given id if exists.
+        """
+        try:
+            photo = Photo.objects.get(id=photo_id)
+        except Photo.DoesNotExist:
+            return Response(
+                {
+                    'res': 'Photo with the given id does not exist.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        fields_to_update = ['url', 'title', 'album_id']
+
+        data = {field_name: request.data.get(field_name) for field_name in fields_to_update if
+                request.data.get(field_name) is not None}
+
+        serializer = PhotoSerializer(instance=photo, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self, request, photo_id, *args, **kwargs):
+        """
+        Deletes the photo with given id if exists.
+        """
+        try:
+            photo = Photo.objects.get(id=photo_id)
+        except Photo.DoesNotExist:
+            return Response(
+                {
+                    'res': 'Photo with the given id does not exist.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        photo.delete()
+        return Response(
+            {
+                'res': 'Photo successfully deleted.'
+            },
+            status=status.HTTP_200_OK
+        )
