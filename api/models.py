@@ -1,13 +1,14 @@
 from django.db import models
+from django.conf import settings
 from PIL import Image
 from colorthief import ColorThief
 
 
 class Photo(models.Model):
-    url = models.FilePathField(
-        path='C:/Users/Marcel/Programowanie/Zadania_rekrutacyjne/Friendly_Solutions/rest_api/media/'
-    )
-    title = models.CharField(max_length=64)
+    # not unique because I had a problem downloading photos from external API (403 always), so I set all the URLs
+    # using a mock URL linking to the same photo
+    url = models.FilePathField(path=settings.PHOTOS_DIR)
+    title = models.CharField(max_length=256)
     album_id = models.PositiveIntegerField()
     width = models.PositiveIntegerField(blank=True)
     height = models.PositiveIntegerField(blank=True)

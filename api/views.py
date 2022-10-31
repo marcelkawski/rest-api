@@ -1,9 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.decorators import api_view
 
 from .models import Photo
 from .serializers import PhotoSerializer
+from .commands.import_photos import import_photos_from_api, import_photos_from_json
 
 
 class PhotoAllView(APIView):
@@ -56,7 +58,6 @@ class PhotoDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     def delete(self, request, photo_id, *args, **kwargs):
         """
         Deletes the photo with given id if exists.
@@ -78,3 +79,13 @@ class PhotoDetailView(APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+@api_view(['POST'])
+def import_data_from_api(request):
+    import_photos_from_api()
+
+
+@api_view(['POST'])
+def import_data_from_json(request):
+    import_photos_from_json()
